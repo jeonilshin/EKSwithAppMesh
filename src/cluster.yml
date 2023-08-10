@@ -1,0 +1,43 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: skills-cluster
+  region: ap-northeast-2
+  version: "1.27"
+cloudWatch:
+  clusterLogging:
+    enableTypes: ["*"]
+iam:
+  withOIDC: true
+vpc:
+  id: vpc_id
+  subnets:
+    public:
+      ap-northeast-2a-pub: 
+        id: public_a
+      ap-northeast-2b-pub: 
+        id: public_b
+    private:
+      ap-northeast-2a-priv: 
+        id: private_a
+      ap-northeast-2b-priv: 
+        id: private_b
+
+managedNodeGroups:
+  - name: skills-mesh-ng
+    instanceName: skills-mesh
+    instanceType: c5.large
+    minSize: 1
+    maxSize: 3
+    desiredCapacity: 2
+    privateNetworking: true
+    subnets:
+      - ap-northeast-2a-priv
+      - ap-northeast-2b-priv
+    iam:
+      withAddonPolicies:
+        imageBuilder: true
+        autoScaler: true
+        awsLoadBalancerController: true
+        cloudWatch: true
+        appMesh: true
